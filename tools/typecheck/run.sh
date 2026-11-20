@@ -18,7 +18,7 @@ for t, n in re.findall(r'<(\w+)\s[^>]*?x:Name="(\w+)"', x):
     out.append(f"  internal {m.get(t, 'System.Windows.Controls.' + t)} {n} = null!;")
 out.append("  public void InitializeComponent(){} } }")
 open(f"{tmp}/xamlfields.cs", "w").write("\n".join(out))
-open(f"{tmp}/gu.cs", "w").write("".join(f"global using {n};\n" for n in ["System", "System.IO", "System.Linq", "System.Collections.Generic", "System.Threading", "System.Threading.Tasks", "System.Net.Http"]))
+open(f"{tmp}/gu.cs", "w").write("".join(f"global using {n};\n" for n in ["System", "System.Linq", "System.Collections.Generic", "System.Threading", "System.Threading.Tasks"]))
 EOF
 REFS=$(ls "$REF"/*.dll | sed 's/^/-r:/' | tr '\n' ' ')
 cd "$ROOT/src/HHT.Bridge.TechConsole"

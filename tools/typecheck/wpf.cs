@@ -124,7 +124,7 @@ namespace System.Windows.Media.Imaging
         public WriteableBitmap Clone() => this;
     }
     public class BitmapFrame : BitmapSource { public static BitmapFrame Create(BitmapSource s) => null!; }
-    public class PngBitmapEncoder { public IList<BitmapFrame> Frames { get; } = new List<BitmapFrame>(); public void Save(Stream s) { } }
+    public class PngBitmapEncoder { public IList<BitmapFrame> Frames { get; } = new List<BitmapFrame>(); public void Save(System.IO.Stream s) { } }
 }
 namespace System.Windows.Shapes { public class Ellipse : FrameworkElement { public System.Windows.Media.Brush? Fill { get; set; } } }
 namespace System.Windows.Documents { public class Run { } }
