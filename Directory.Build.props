@@ -1,0 +1,12 @@
+<Project>
+  <PropertyGroup>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <Company>Hammer Hill Technologies</Company>
+    <Product>HHT USB Bridge</Product>
+    <Copyright>Copyright © Hammer Hill Technologies</Copyright>
+    <Version>0.1.0</Version>
+  </PropertyGroup>
+</Project>

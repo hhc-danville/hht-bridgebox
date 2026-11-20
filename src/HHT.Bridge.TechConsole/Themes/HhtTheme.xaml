@@ -1,0 +1,54 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!-- Hammer Hill Technologies palette: charcoal, blue, white, subtle green for "connected". -->
+    <Color x:Key="HhtCharcoalColor">#FF17181B</Color>
+    <Color x:Key="HhtPanelColor">#FF222429</Color>
+    <Color x:Key="HhtPanelBorderColor">#FF32353C</Color>
+    <Color x:Key="HhtBlueColor">#FF2F7DF6</Color>
+    <Color x:Key="HhtGreenColor">#FF34C772</Color>
+    <Color x:Key="HhtAmberColor">#FFE2A33A</Color>
+    <Color x:Key="HhtRedColor">#FFE5534B</Color>
+
+    <SolidColorBrush x:Key="HhtCharcoal" Color="{StaticResource HhtCharcoalColor}" />
+    <SolidColorBrush x:Key="HhtPanel" Color="{StaticResource HhtPanelColor}" />
+    <SolidColorBrush x:Key="HhtPanelBorder" Color="{StaticResource HhtPanelBorderColor}" />
+    <SolidColorBrush x:Key="HhtBlue" Color="{StaticResource HhtBlueColor}" />
+    <SolidColorBrush x:Key="HhtGreen" Color="{StaticResource HhtGreenColor}" />
+    <SolidColorBrush x:Key="HhtAmber" Color="{StaticResource HhtAmberColor}" />
+    <SolidColorBrush x:Key="HhtRed" Color="{StaticResource HhtRedColor}" />
+    <SolidColorBrush x:Key="HhtMuted" Color="#FF9AA0AA" />
+    <SolidColorBrush x:Key="HhtText" Color="#FFF3F4F6" />
+
+    <Style x:Key="SectionHeader" TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{StaticResource HhtMuted}" />
+        <Setter Property="FontSize" Value="11" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Margin" Value="0,14,0,6" />
+    </Style>
+
+    <Style x:Key="Card" TargetType="Border">
+        <Setter Property="Background" Value="{StaticResource HhtPanel}" />
+        <Setter Property="BorderBrush" Value="{StaticResource HhtPanelBorder}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="8" />
+        <Setter Property="Padding" Value="12" />
+        <Setter Property="Margin" Value="0,0,0,10" />
+    </Style>
+
+    <Style x:Key="Pill" TargetType="Border">
+        <Setter Property="CornerRadius" Value="11" />
+        <Setter Property="Padding" Value="10,3" />
+        <Setter Property="Margin" Value="6,0,0,0" />
+        <Setter Property="Background" Value="#FF2B2E35" />
+        <Setter Property="BorderBrush" Value="{StaticResource HhtPanelBorder}" />
+        <Setter Property="BorderThickness" Value="1" />
+    </Style>
+
+    <Style x:Key="Led" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="11" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Margin" Value="8,0,0,0" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="Foreground" Value="#FF555A63" />
+    </Style>
+</ResourceDictionary>

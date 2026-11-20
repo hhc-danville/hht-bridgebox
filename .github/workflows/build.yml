@@ -1,0 +1,41 @@
+name: build
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Build
+        run: dotnet build HHT.BridgeBox.sln -c Release
+      - name: Core tests
+        run: dotnet run --project tests/HHT.Bridge.Core.Tests -c Release --no-build
+      - name: Publish console (unsigned)
+        run: dotnet publish src/HHT.Bridge.TechConsole -c Release -r win-x64 --self-contained true -o publish/bridge
+      - uses: actions/upload-artifact@v4
+        with:
+          name: HHTBridgeConsole-win-x64-unsigned
+          path: publish/bridge
+
+  linux-checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Core tests (incl. virtual-media agent end-to-end)
+        run: dotnet run --project tests/HHT.Bridge.Core.Tests -c Release
+      - name: Controller firmware logic
+        run: g++ -std=c++17 -Wall -Wextra -Werror -Ifirmware/rp2040-controller firmware/rp2040-controller/BridgeController.cpp firmware/rp2040-controller/test/test_controller.cpp -o ctrltest -lm && ./ctrltest
+      - name: Console type-check against API stubs
+        run: bash tools/typecheck/run.sh
+      - name: Pi scripts
+        run: bash -n firmware/virtual-media/install.sh && bash -n firmware/virtual-media/hht-gadget.sh && bash -n server/cloud-relay/install.sh && python3 -m py_compile firmware/virtual-media/hht_vmedia_agent.py server/cloud-relay/hht_bridge_relay.py

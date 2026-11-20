@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Platform-neutral logic: CH9329 protocol, HID tables, input routing, logging, settings.
+       No NuGet dependencies so it builds and tests on Windows, Linux and macOS. -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>HHT.Bridge.Core</RootNamespace>
+    <AssemblyName>HHT.Bridge.Core</AssemblyName>
+  </PropertyGroup>
+</Project>

@@ -1,0 +1,586 @@
+<Window x:Class="HHT.Bridge.TechConsole.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="HHT Bridge Console — Hammer Hill Technologies"
+        Width="1480" Height="920" MinWidth="1000" MinHeight="640"
+        WindowStartupLocation="CenterScreen"
+        Background="{StaticResource HhtCharcoal}"
+        Foreground="{StaticResource HhtText}">
+    <Grid x:Name="RootGrid">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition x:Name="SidebarColumn" Width="360" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <!-- ===================== Header ===================== -->
+        <Border x:Name="HeaderBar" Grid.Row="0" Grid.ColumnSpan="2" Background="{StaticResource HhtPanel}"
+                BorderBrush="{StaticResource HhtPanelBorder}" BorderThickness="0,0,0,1" Padding="16,10">
+            <DockPanel LastChildFill="False">
+                <StackPanel DockPanel.Dock="Left" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Border Background="{StaticResource HhtBlue}" CornerRadius="6" Width="34" Height="34">
+                        <TextBlock Text="HHT" Foreground="White" FontWeight="Bold" FontSize="12"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                    <StackPanel Margin="10,0,0,0" VerticalAlignment="Center">
+                        <TextBlock x:Name="AppTitleText" Text="HHT Bridge Console" FontSize="16" FontWeight="SemiBold" />
+                        <TextBlock x:Name="SubtitleText" Text="Hammer Hill Technologies · Bridge Box technician edition"
+                                   FontSize="11" Foreground="{StaticResource HhtMuted}" />
+                    </StackPanel>
+                </StackPanel>
+
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Border x:Name="RecPill" Style="{StaticResource Pill}" Visibility="Collapsed" Background="#55E5534B">
+                        <TextBlock Text="● REC" FontSize="12" FontWeight="SemiBold" Foreground="#FFFF8A80" />
+                    </Border>
+                    <Border x:Name="SharePill" Style="{StaticResource Pill}" Visibility="Collapsed">
+                        <TextBlock x:Name="SharePillText" Text="Shared" FontSize="12" />
+                    </Border>
+                    <Border Style="{StaticResource Pill}">
+                        <StackPanel Orientation="Horizontal">
+                            <Ellipse x:Name="VideoDot" Width="8" Height="8" Fill="#FF555A63" VerticalAlignment="Center" />
+                            <TextBlock x:Name="VideoPillText" Text="Video: off" Margin="6,0,0,0" FontSize="12" />
+                        </StackPanel>
+                    </Border>
+                    <Border Style="{StaticResource Pill}">
+                        <StackPanel Orientation="Horizontal">
+                            <Ellipse x:Name="ControlDot" Width="8" Height="8" Fill="#FF555A63" VerticalAlignment="Center" />
+                            <TextBlock x:Name="ControlPillText" Text="Control: not connected" Margin="6,0,0,0" FontSize="12" />
+                        </StackPanel>
+                    </Border>
+                    <Border Style="{StaticResource Pill}" ToolTip="Keyboard lock lights reported by the target computer">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Target LEDs" FontSize="12" Foreground="{StaticResource HhtMuted}" />
+                            <TextBlock x:Name="NumLed" Text="NUM" Style="{StaticResource Led}" />
+                            <TextBlock x:Name="CapsLed" Text="CAPS" Style="{StaticResource Led}" />
+                            <TextBlock x:Name="ScrollLed" Text="SCRL" Style="{StaticResource Led}" />
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </DockPanel>
+        </Border>
+
+        <!-- ===================== Sidebar (tabs) ===================== -->
+        <TabControl x:Name="Sidebar" Grid.Row="1" Grid.Column="0" Margin="8,6,4,6" Background="Transparent" BorderThickness="0">
+
+            <!-- ============ CONNECT ============ -->
+            <TabItem Header="Connect">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="4,0,8,8">
+                    <StackPanel>
+                        <TextBlock Text="VIDEO (HDMI CAPTURE)" Style="{StaticResource SectionHeader}" />
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <ComboBox x:Name="VideoDeviceCombo" ToolTip="UVC capture device (HDMI-to-USB dongle)" />
+                                <ComboBox x:Name="VideoModeCombo" Margin="0,8,0,0" ToolTip="Capture resolution and frame rate" />
+                                <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                                    <Button x:Name="VideoStartButton" Content="Start video" Click="VideoStart_Click"
+                                            Style="{DynamicResource AccentButtonStyle}" MinWidth="110" />
+                                    <Button Content="Refresh" Click="RefreshDevices_Click" Margin="8,0,0,0" />
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+
+                        <TextBlock Text="KEYBOARD &amp; MOUSE (CH9329)" Style="{StaticResource SectionHeader}" />
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <ComboBox x:Name="PortCombo" ToolTip="USB-serial port of the CH9329 cable" />
+                                <ComboBox x:Name="BaudCombo" Margin="0,8,0,0" ToolTip="CH9329 baud rate (factory default 9600)" />
+                                <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                                    <Button x:Name="ControlConnectButton" Content="Connect" Click="ControlConnect_Click"
+                                            Style="{DynamicResource AccentButtonStyle}" MinWidth="110" />
+                                    <Button x:Name="AutoDetectButton" Content="Auto-detect" Click="AutoDetect_Click" Margin="8,0,0,0" />
+                                </StackPanel>
+                                <TextBlock x:Name="ChipInfoText" Margin="0,8,0,0" FontSize="11" TextWrapping="Wrap"
+                                           Foreground="{StaticResource HhtMuted}" Text="Not connected." />
+                                <TextBlock Text="Mouse mode" Margin="0,12,0,4" FontSize="12" />
+                                <StackPanel Orientation="Horizontal">
+                                    <RadioButton x:Name="AbsoluteRadio" Content="Absolute" GroupName="MouseMode" IsChecked="True"
+                                                 Checked="MouseMode_Changed"
+                                                 ToolTip="Pointer goes exactly where you point. Best for Windows, Linux, graphical UEFI." />
+                                    <RadioButton x:Name="RelativeRadio" Content="Relative" GroupName="MouseMode" Margin="16,0,0,0"
+                                                 Checked="MouseMode_Changed"
+                                                 ToolTip="Classic mouse movement. Use for old BIOS setups that ignore absolute pointers." />
+                                </StackPanel>
+                                <CheckBox x:Name="HideCursorCheck" Content="Hide my cursor over the video while controlling"
+                                          Margin="0,8,0,0" IsChecked="True" FontSize="12" Click="HideCursor_Click" />
+                            </StackPanel>
+                        </Border>
+                        <TextBlock TextWrapping="Wrap" FontSize="11" Foreground="{StaticResource HhtMuted}" Margin="2,4,2,0">
+                            Click the video to control the target. Tap <Run FontWeight="SemiBold" Text="Right Ctrl" /> to release.
+                            Right Ctrl + F full screen · Right Ctrl + S screenshot · Right Ctrl + Del sends Ctrl+Alt+Del.
+                        </TextBlock>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- ============ TICKET (RMM + time) ============ -->
+            <TabItem Header="Ticket">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="4,0,8,8">
+                    <StackPanel>
+                        <TextBlock Text="RMM TICKET" Style="{StaticResource SectionHeader}" />
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <DockPanel>
+                                    <Button DockPanel.Dock="Right" x:Name="TicketLookupButton" Content="Look up" Click="TicketLookup_Click" Margin="6,0,0,0" />
+                                    <TextBox x:Name="TicketBox" ToolTip="Ticket number, e.g. T-00012 or 12" />
+                                </DockPanel>
+                                <TextBlock x:Name="TicketInfoText" Margin="0,8,0,0" TextWrapping="Wrap" FontSize="12" Text="No ticket loaded." />
+                                <TextBlock Text="When finished" FontSize="12" Margin="0,10,0,4" />
+                                <ComboBox x:Name="FinalStatusCombo" />
+                                <CheckBox x:Name="ReportToCustomerCheck" Content="Report visible to the customer (customer copy)" Margin="0,6,0,0" FontSize="12" Click="ReportToCustomer_Click" />
+                                <WrapPanel Margin="0,8,0,0">
+                                    <Button x:Name="PostSessionButton" Content="Post session to ticket" Click="PostSession_Click" Style="{DynamicResource AccentButtonStyle}" Margin="0,0,8,6" />
+                                    <Button Content="Attach screenshots" Click="AttachShots_Click" Margin="0,0,8,6" />
+                                    <Button x:Name="RetryQueueButton" Content="Send queued notes" Click="RetryQueue_Click" Margin="0,0,8,6" />
+                                </WrapPanel>
+                                <TextBlock x:Name="RmmStatusText" FontSize="11" TextWrapping="Wrap" Foreground="{StaticResource HhtMuted}" />
+                            </StackPanel>
+                        </Border>
+
+                        <TextBlock Text="BENCH TIME" Style="{StaticResource SectionHeader}" />
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <TextBlock x:Name="TimeText" TextWrapping="Wrap" FontSize="12" />
+                                <TextBlock FontSize="11" Foreground="{StaticResource HhtMuted}" TextWrapping="Wrap" Margin="0,6,0,0"
+                                           Text="Counts active work (input, macros, keys, tests). Idle gaps over 5 minutes are not billed. Saved to timesheet.csv and posted with the session." />
+                            </StackPanel>
+                        </Border>
+
+                        <TextBlock Text="CONNECTION" Style="{StaticResource SectionHeader}" />
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <TextBlock Text="RMM address" FontSize="12" />
+                                <TextBox x:Name="RmmUrlBox" Margin="0,2,0,0" />
+                                <TextBlock Text="Your API key (RMM → My account → API keys)" FontSize="12" Margin="0,6,0,0" />
+                                <PasswordBox x:Name="RmmKeyBox" Margin="0,2,0,0" />
+                                <Button Content="Save &amp; test" Click="RmmTest_Click" Margin="0,8,0,0" HorizontalAlignment="Left" />
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- ============ KEYS ============ -->
+            <TabItem Header="Keys">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="4,0,8,8">
+                    <StackPanel>
+                        <TextBlock Text="GET INTO BIOS / BOOT MENU" Style="{StaticResource SectionHeader}" />
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <ComboBox x:Name="BiosBrandCombo" SelectionChanged="BiosBrand_Changed" />
+                                <TextBlock x:Name="BiosKeysText" Margin="0,6,0,0" FontSize="11" TextWrapping="Wrap" Foreground="{StaticResource HhtMuted}" />
+                                <WrapPanel Margin="0,8,0,0">
+                                    <Button x:Name="BiosSetupButton" Content="Enter BIOS setup" Click="BiosSetup_Click" Margin="0,0,8,6"
+                                            Style="{DynamicResource AccentButtonStyle}" />
+                                    <Button x:Name="BootMenuButton" Content="Open boot menu" Click="BootMenu_Click" Margin="0,0,8,6" />
+                                    <Button x:Name="BiosStopButton" Content="Stop" Click="BiosStop_Click" Margin="0,0,8,6" IsEnabled="False" />
+                                </WrapPanel>
+                                <TextBlock x:Name="BiosStatusText" FontSize="11" TextWrapping="Wrap" Foreground="{StaticResource HhtMuted}"
+                                           Text="Press a button, then power on or restart the customer PC. Keys repeat until the firmware screen is detected (60 s max)." />
+                            </StackPanel>
+                        </Border>
+
+                        <TextBlock Text="SEND KEYS" Style="{StaticResource SectionHeader}" />
+                        <Border Style="{StaticResource Card}">
+                            <WrapPanel x:Name="SpecialKeysPanel" />
+                        </Border>
+
+                        <TextBlock Text="TYPE TEXT INTO TARGET (US LAYOUT)" Style="{StaticResource SectionHeader}" />
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <TextBox x:Name="TypeTextBox" Height="70" AcceptsReturn="True" AcceptsTab="True"
+                                         TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"
+                                         ToolTip="Typed as keystrokes. Not saved to the session log." />
+                                <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                                    <Button x:Name="TypeTextButton" Content="Type it" Click="TypeText_Click" MinWidth="80" />
+                                    <Button x:Name="TypeClipboardButton" Content="Type clipboard" Click="TypeClipboard_Click" Margin="8,0,0,0" />
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- ============ GUIDE (playbooks + AI) ============ -->
+            <TabItem Header="Guide">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="4,0,8,8">
+                    <StackPanel>
+                        <TextBlock Text="REPAIR PLAYBOOKS" Style="{StaticResource SectionHeader}" />
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <ComboBox x:Name="PlaybookCombo" />
+                                <Button Content="Start" Click="PlaybookStart_Click" Margin="0,8,0,0" HorizontalAlignment="Left" />
+                                <TextBlock x:Name="PlaybookStepTitle" FontWeight="SemiBold" Margin="0,10,0,0" TextWrapping="Wrap" />
+                                <TextBlock x:Name="PlaybookStepText" Margin="0,4,0,0" TextWrapping="Wrap" FontSize="12" />
+                                <WrapPanel x:Name="PlaybookButtons" Margin="0,8,0,0" IsEnabled="False">
+                                    <Button x:Name="PlaybookDoButton" Content="Do it" Click="PlaybookDo_Click" Margin="0,0,8,6" />
+                                    <Button x:Name="PlaybookCheckButton" Content="Check screen" Click="PlaybookCheck_Click" Margin="0,0,8,6" />
+                                    <Button Content="Next" Click="PlaybookNext_Click" Margin="0,0,8,6" />
+                                    <Button Content="Back" Click="PlaybookBack_Click" Margin="0,0,8,6" />
+                                </WrapPanel>
+                            </StackPanel>
+                        </Border>
+
+                        <TextBlock Text="AI ASSISTANT" Style="{StaticResource SectionHeader}" />
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <TextBox x:Name="AiQuestionBox" Height="50" TextWrapping="Wrap" AcceptsReturn="True"
+                                         ToolTip="Optional question, e.g. 'Why won't this boot?'. The AI sees the screen text, findings and ticket issue." />
+                                <Button x:Name="AskAiButton" Content="Ask about this screen" Click="AskAi_Click" Margin="0,8,0,0" HorizontalAlignment="Left"
+                                        Style="{DynamicResource AccentButtonStyle}" />
+                                <TextBlock x:Name="AiSummaryText" Margin="0,8,0,0" TextWrapping="Wrap" FontSize="12" />
+                                <ListBox x:Name="AiFindingsList" Height="150" Margin="0,6,0,0" />
+                                <TextBlock FontSize="11" Foreground="{StaticResource HhtMuted}" TextWrapping="Wrap" Margin="0,6,0,0"
+                                           Text="Suggestions only: nothing is typed or changed on the customer PC by the AI." />
+                                <Expander Header="AI backend" Margin="0,8,0,0">
+                                    <StackPanel>
+                                        <TextBox x:Name="AiUrlBox" Margin="0,4,0,0" />
+                                        <TextBlock Text="Gate key (same as aitech_key.txt)" FontSize="12" Margin="0,6,0,0" />
+                                        <PasswordBox x:Name="AiKeyBox" Margin="0,2,0,0" />
+                                        <Button Content="Save &amp; test" Click="AiTest_Click" Margin="0,6,0,0" HorizontalAlignment="Left" />
+                                    </StackPanel>
+                                </Expander>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- ============ MACROS ============ -->
+            <TabItem Header="Macros">
+                <DockPanel Margin="4,0,8,8">
+                    <StackPanel DockPanel.Dock="Bottom" Margin="0,8,0,0">
+                        <TextBlock x:Name="MacroDescText" TextWrapping="Wrap" FontSize="11" Foreground="{StaticResource HhtMuted}" MinHeight="32" />
+                        <WrapPanel Margin="0,6,0,0">
+                            <Button x:Name="MacroRunButton" Content="Run macro" Click="MacroRun_Click" Style="{DynamicResource AccentButtonStyle}" Margin="0,0,8,6" />
+                            <Button x:Name="MacroStopButton" Content="Stop" Click="MacroStop_Click" IsEnabled="False" Margin="0,0,8,6" />
+                            <Button Content="Edit my macros" Click="MacroEdit_Click" Margin="0,0,8,6" />
+                            <Button Content="Reload" Click="MacroReload_Click" Margin="0,0,8,6" />
+                        </WrapPanel>
+                        <TextBlock x:Name="MacroStatusText" FontSize="11" Foreground="{StaticResource HhtMuted}" TextWrapping="Wrap" />
+                        <Expander Header="Hand-off: install our agent" Margin="0,8,0,0">
+                            <StackPanel>
+                                <TextBlock Text="Installer URL (https, .exe or .msi)" FontSize="12" Margin="0,4,0,0" />
+                                <TextBox x:Name="AgentUrlBox" />
+                                <TextBlock Text="Arguments (optional)" FontSize="12" Margin="0,6,0,0" />
+                                <TextBox x:Name="AgentArgsBox" />
+                                <Button Content="Install agent on customer PC" Click="AgentInstall_Click" Margin="0,8,0,0" HorizontalAlignment="Left" />
+                            </StackPanel>
+                        </Expander>
+                    </StackPanel>
+                    <TextBlock DockPanel.Dock="Top" Text="ONE-CLICK KEY SEQUENCES" Style="{StaticResource SectionHeader}" />
+                    <ListBox x:Name="MacroList" SelectionChanged="MacroList_SelectionChanged" MouseDoubleClick="MacroList_DoubleClick" />
+                </DockPanel>
+            </TabItem>
+
+            <!-- ============ TOOLS ============ -->
+            <TabItem Header="Tools">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="4,0,8,8">
+                    <StackPanel>
+                        <TextBlock Text="CAPTURE" Style="{StaticResource SectionHeader}" />
+                        <Border Style="{StaticResource Card}">
+                            <WrapPanel>
+                                <Button Content="Screenshot" Click="Screenshot_Click" Margin="0,0,8,8" />
+                                <Button x:Name="RecordButton" Content="Start recording" Click="Record_Click" Margin="0,0,8,8" />
+                                <Button Content="Full screen" Click="Fullscreen_Click" Margin="0,0,8,8" />
+                                <Button Content="Screenshots folder" Click="OpenScreenshots_Click" Margin="0,0,8,8" />
+                                <Button Content="Annotate last screenshot" Click="Annotate_Click" Margin="0,0,8,8" />
+                            </WrapPanel>
+                        </Border>
+
+                        <TextBlock Text="READ THE SCREEN (OCR)" Style="{StaticResource SectionHeader}" />
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <StackPanel Orientation="Horizontal">
+                                    <Button x:Name="ReadScreenButton" Content="Read screen now" Click="ReadScreen_Click" />
+                                    <CheckBox x:Name="AutoReadCheck" Content="Keep reading (every 3 s)" Margin="12,0,0,0"
+                                              VerticalAlignment="Center" Click="AutoRead_Click" FontSize="12" />
+                                </StackPanel>
+                                <TextBlock x:Name="OcrStatusText" Margin="0,6,0,0" FontSize="11" Foreground="{StaticResource HhtMuted}" TextWrapping="Wrap" />
+                                <ListBox x:Name="FindingsList" Height="150" Margin="0,8,0,0"
+                                         ToolTip="Serial numbers, model, BIOS version and boot/disk errors found on screen. Added to the report." />
+                                <Button Content="Copy findings" Click="CopyFindings_Click" HorizontalAlignment="Left" Margin="0,6,0,0" />
+                            </StackPanel>
+                        </Border>
+
+                        <TextBlock Text="BIOS SETTINGS: BEFORE / AFTER" Style="{StaticResource SectionHeader}" />
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <DockPanel>
+                                    <TextBlock Text="Page" VerticalAlignment="Center" Margin="0,0,6,0" FontSize="12" />
+                                    <ComboBox x:Name="ComparePageCombo" IsEditable="True" />
+                                </DockPanel>
+                                <WrapPanel Margin="0,8,0,0">
+                                    <Button Content="Save BEFORE" Click="SaveBefore_Click" Margin="0,0,8,6" />
+                                    <Button Content="Compare with BEFORE" Click="CompareAfter_Click" Margin="0,0,8,6" />
+                                </WrapPanel>
+                                <ListBox x:Name="CompareList" Height="90" />
+                            </StackPanel>
+                        </Border>
+
+                        <TextBlock Text="BEEP CODES" Style="{StaticResource SectionHeader}" />
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <ComboBox x:Name="AudioDeviceCombo" ToolTip="Microphone near the PC speaker (PC beeps are not carried over HDMI)" />
+                                <WrapPanel Margin="0,8,0,0">
+                                    <Button x:Name="ListenButton" Content="Listen for beep codes" Click="Listen_Click" Margin="0,0,8,6" />
+                                </WrapPanel>
+                                <TextBlock x:Name="BeepResultText" TextWrapping="Wrap" FontSize="12" />
+                            </StackPanel>
+                        </Border>
+
+                        <TextBlock Text="CUSTOMER SIGN-OFF" Style="{StaticResource SectionHeader}" />
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <TextBox x:Name="SignSummaryBox" Height="60" TextWrapping="Wrap" AcceptsReturn="True"
+                                         ToolTip="Work summary the customer agrees to" />
+                                <DockPanel Margin="0,6,0,0">
+                                    <TextBlock Text="Total" VerticalAlignment="Center" Margin="0,0,6,0" FontSize="12" />
+                                    <TextBox x:Name="SignTotalBox" />
+                                </DockPanel>
+                                <Button Content="Start sign-off on a tablet" Click="StartSignOff_Click" Margin="0,8,0,0" HorizontalAlignment="Left" />
+                                <TextBlock x:Name="SignStatusText" Margin="0,6,0,0" TextWrapping="Wrap" FontSize="12" />
+                            </StackPanel>
+                        </Border>
+
+                        <TextBlock Text="SERVICE REPORT" Style="{StaticResource SectionHeader}" />
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <TextBox x:Name="NotesBox" Height="70" AcceptsReturn="True" TextWrapping="Wrap"
+                                         VerticalScrollBarVisibility="Auto" ToolTip="Technician notes for the report" />
+                                <WrapPanel Margin="0,8,0,0">
+                                    <Button Content="Create report" Click="Report_Click" Style="{DynamicResource AccentButtonStyle}" Margin="0,0,8,6" />
+                                    <Button Content="Reports folder" Click="OpenReports_Click" Margin="0,0,8,6" />
+                                    <Button Content="Session logs" Click="OpenLogs_Click" Margin="0,0,8,6" />
+                                </WrapPanel>
+                                <TextBlock FontSize="11" Foreground="{StaticResource HhtMuted}" TextWrapping="Wrap"
+                                           Text="HTML report with timeline, findings and screenshots. Open it in a browser and print to PDF for the customer or ticket." />
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- ============ ALERTS ============ -->
+            <TabItem Header="Alerts">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="4,0,8,8">
+                    <StackPanel>
+                        <TextBlock Text="BENCH ALERTS" Style="{StaticResource SectionHeader}" />
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <CheckBox x:Name="AlertsEnabledCheck" Content="Watch this bench and alert me" FontWeight="SemiBold" Click="AlertSettings_Changed" />
+                                <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                                    <CheckBox x:Name="AlertIdleCheck" Content="Screen unchanged for" VerticalAlignment="Center" Click="AlertSettings_Changed" />
+                                    <TextBox x:Name="IdleMinutesBox" Width="50" Margin="6,0" LostFocus="AlertSettings_Changed" />
+                                    <TextBlock Text="minutes" VerticalAlignment="Center" />
+                                </StackPanel>
+                                <CheckBox x:Name="AlertChangedCheck" Content="Screen changes after being still (reboot started)" Margin="0,8,0,0" Click="AlertSettings_Changed" />
+                                <CheckBox x:Name="AlertLostCheck" Content="Video signal lost" Margin="0,8,0,0" Click="AlertSettings_Changed" />
+                                <TextBlock Text="Text appears on screen (needs Keep reading on the Tools tab):" Margin="0,10,0,4" FontSize="12" />
+                                <TextBox x:Name="AlertTextBox" ToolTip="Regular expression, e.g.  100%|complete|press any key" LostFocus="AlertSettings_Changed" />
+                            </StackPanel>
+                        </Border>
+
+                        <TextBlock Text="SEND TO MY PHONE" Style="{StaticResource SectionHeader}" />
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <TextBox x:Name="NotifyUrlBox" ToolTip="ntfy topic URL (e.g. https://ntfy.sh/hhc-bench-7f3k or your own ntfy on the droplet) or any webhook that accepts POST"
+                                         LostFocus="AlertSettings_Changed" />
+                                <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                                    <Button Content="Send test" Click="TestNotify_Click" />
+                                </StackPanel>
+                                <TextBlock FontSize="11" Foreground="{StaticResource HhtMuted}" TextWrapping="Wrap" Margin="0,6,0,0"
+                                           Text="Install the free ntfy app on your phone and subscribe to the same topic. Alerts also flash this window and appear below." />
+                            </StackPanel>
+                        </Border>
+
+                        <TextBlock Text="RECENT ALERTS" Style="{StaticResource SectionHeader}" />
+                        <ListBox x:Name="AlertList" Height="140" />
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- ============ SHARE ============ -->
+            <TabItem Header="Share">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="4,0,8,8">
+                    <StackPanel>
+                        <TextBlock Text="REMOTE VIEWING &amp; DASHBOARD" Style="{StaticResource SectionHeader}" />
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <TextBlock Text="Bench name" FontSize="12" />
+                                <TextBox x:Name="BenchNameBox" Margin="0,4,0,0" LostFocus="BenchName_Changed" />
+                                <CheckBox x:Name="ShareCheck" Content="Share this bench on the shop network" FontWeight="SemiBold"
+                                          Margin="0,10,0,0" Click="Share_Click" />
+                                <CheckBox x:Name="AllowControlCheck" Content="Allow remote keyboard &amp; mouse control" Margin="0,8,0,0"
+                                          Click="AllowControl_Click"
+                                          ToolTip="Off by default every session. Viewers can only watch until you tick this." />
+                                <Button x:Name="RevokeButton" Content="Take back control" Click="Revoke_Click" Margin="0,8,0,0" HorizontalAlignment="Left" IsEnabled="False" />
+                                <TextBlock x:Name="ShareStatusText" Margin="0,8,0,0" FontSize="11" TextWrapping="Wrap" Foreground="{StaticResource HhtMuted}" Text="Not shared." />
+                            </StackPanel>
+                        </Border>
+
+                        <TextBlock Text="ACCESS" Style="{StaticResource SectionHeader}" />
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <TextBlock Text="Shop access key (use the same key on every bench)" FontSize="12" />
+                                <DockPanel Margin="0,4,0,0">
+                                    <Button DockPanel.Dock="Right" Content="Copy" Click="CopyKey_Click" Margin="6,0,0,0" />
+                                    <TextBox x:Name="ShopKeyBox" FontFamily="Consolas" LostFocus="ShopKey_Changed" />
+                                </DockPanel>
+                                <Button Content="Generate new key" Click="NewKey_Click" Margin="0,6,0,0" HorizontalAlignment="Left" />
+                                <TextBlock Text="Open on a tablet / another PC:" FontSize="12" Margin="0,10,0,4" />
+                                <ListBox x:Name="ShareUrlList" Height="74" FontFamily="Consolas" FontSize="11" MouseDoubleClick="ShareUrl_DoubleClick" />
+                                <TextBlock x:Name="FingerprintText" FontSize="10" TextWrapping="Wrap" Foreground="{StaticResource HhtMuted}" Margin="0,6,0,0" />
+                                <Button Content="Open bench dashboard" Click="OpenDashboard_Click" Margin="0,8,0,0" HorizontalAlignment="Left" />
+                            </StackPanel>
+                        </Border>
+                        <TextBlock Text="CLOUD DASHBOARD (ALL SHOPS)" Style="{StaticResource SectionHeader}" />
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <TextBlock Text="Relay address" FontSize="12" />
+                                <TextBox x:Name="CloudUrlBox" Margin="0,2,0,0" />
+                                <TextBlock Text="Shop publish key" FontSize="12" Margin="0,6,0,0" />
+                                <PasswordBox x:Name="CloudKeyBox" Margin="0,2,0,0" />
+                                <CheckBox x:Name="CloudCheck" Content="Publish this bench (view only, every 5 s)" Margin="0,8,0,0" Click="Cloud_Click" />
+                                <TextBlock x:Name="CloudStatusText" Margin="0,6,0,0" FontSize="11" TextWrapping="Wrap" Foreground="{StaticResource HhtMuted}" />
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- ============ HARDWARE ============ -->
+            <TabItem Header="Hardware">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="4,0,8,8">
+                    <StackPanel>
+                        <TextBlock Text="POWER &amp; USB CONTROLLER (BRIDGE BOX v0.5+)" Style="{StaticResource SectionHeader}" />
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <StackPanel Orientation="Horizontal">
+                                    <Button x:Name="FindControllerButton" Content="Find controller" Click="FindController_Click" />
+                                    <Button x:Name="DisconnectControllerButton" Content="Disconnect" Click="DisconnectController_Click" Margin="8,0,0,0" IsEnabled="False" />
+                                </StackPanel>
+                                <TextBlock x:Name="ControllerStatusText" Margin="0,6,0,0" FontSize="11" TextWrapping="Wrap" Foreground="{StaticResource HhtMuted}" Text="Not connected." />
+                                <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                                    <TextBlock Text="Target power LED" FontSize="12" VerticalAlignment="Center" />
+                                    <Ellipse x:Name="PwrLedDot" Width="10" Height="10" Margin="6,0,14,0" Fill="#FF555A63" />
+                                    <TextBlock Text="Disk activity" FontSize="12" VerticalAlignment="Center" />
+                                    <Ellipse x:Name="HddLedDot" Width="10" Height="10" Margin="6,0,0,0" Fill="#FF555A63" />
+                                </StackPanel>
+                                <WrapPanel x:Name="ControllerButtons" Margin="0,10,0,0" IsEnabled="False">
+                                    <Button Content="Power button" Click="PowerShort_Click" Margin="0,0,8,6" />
+                                    <Button Content="Force off (6 s)" Click="PowerLong_Click" Margin="0,0,8,6" />
+                                    <Button Content="Reset" Click="Reset_Click" Margin="0,0,8,6" />
+                                    <Button Content="USB port → laptop" Click="UsbHost_Click" Margin="0,0,8,6" />
+                                    <Button Content="USB port → customer PC" Click="UsbTarget_Click" Margin="0,0,8,6" />
+                                </WrapPanel>
+                                <TextBlock x:Name="UsbSideText" FontSize="11" Foreground="{StaticResource HhtMuted}" />
+                            </StackPanel>
+                        </Border>
+
+                        <TextBlock Text="SENSOR CLIP" Style="{StaticResource SectionHeader}" />
+                        <Border Style="{StaticResource Card}">
+                            <TextBlock x:Name="SensorText" TextWrapping="Wrap" FontSize="12" Text="Needs the controller with the sensor clip (firmware 1.1)." />
+                        </Border>
+
+                        <TextBlock Text="HANDS-OFF HARDWARE TESTS" Style="{StaticResource SectionHeader}" />
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <ComboBox x:Name="TestPlanCombo" SelectionChanged="TestPlan_Changed" />
+                                <TextBlock Text="Image on the virtual-media module" FontSize="12" Margin="0,6,0,0" />
+                                <TextBox x:Name="TestImageBox" />
+                                <CheckBox x:Name="TestCdCheck" Content="Mount as CD-ROM (ISO)" IsChecked="True" Margin="0,6,0,0" FontSize="12" />
+                                <CheckBox x:Name="TestAlreadyBootedCheck" Content="Already booted into the test (just watch)" Margin="0,4,0,0" FontSize="12" />
+                                <WrapPanel Margin="0,8,0,0">
+                                    <Button x:Name="RunTestButton" Content="Run test" Click="RunTest_Click" Style="{DynamicResource AccentButtonStyle}" Margin="0,0,8,6" />
+                                    <Button x:Name="StopTestButton" Content="Stop" Click="StopTest_Click" IsEnabled="False" Margin="0,0,8,6" />
+                                </WrapPanel>
+                                <TextBlock x:Name="TestStatusText" TextWrapping="Wrap" FontSize="12" />
+                            </StackPanel>
+                        </Border>
+
+                        <TextBlock Text="VIRTUAL MEDIA (BOOT FROM ISO)" Style="{StaticResource SectionHeader}" />
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <TextBlock Text="Module URL" FontSize="12" />
+                                <TextBox x:Name="VmUrlBox" Margin="0,2,0,0" ToolTip="https://&lt;pi-address&gt;:8444 (printed by install.sh)" />
+                                <TextBlock Text="Token" FontSize="12" Margin="0,6,0,0" />
+                                <PasswordBox x:Name="VmTokenBox" Margin="0,2,0,0" />
+                                <TextBlock Text="Certificate fingerprint (SHA-256)" FontSize="12" Margin="0,6,0,0" />
+                                <TextBox x:Name="VmFingerprintBox" Margin="0,2,0,0" FontFamily="Consolas" FontSize="11" />
+                                <Button x:Name="VmConnectButton" Content="Connect" Click="VmConnect_Click" Margin="0,8,0,0" HorizontalAlignment="Left" />
+                                <TextBlock x:Name="VmStatusText" Margin="0,6,0,0" FontSize="11" TextWrapping="Wrap" Foreground="{StaticResource HhtMuted}" Text="Not connected." />
+                                <ListBox x:Name="VmImageList" Height="110" Margin="0,8,0,0" />
+                                <ProgressBar x:Name="VmProgress" Height="6" Margin="0,6,0,0" Visibility="Collapsed" Maximum="1" />
+                                <WrapPanel x:Name="VmButtons" Margin="0,8,0,0" IsEnabled="False">
+                                    <Button Content="Upload ISO/IMG" Click="VmUpload_Click" Margin="0,0,8,6" />
+                                    <Button Content="Mount as CD-ROM" Click="VmMountCd_Click" Margin="0,0,8,6" />
+                                    <Button Content="Mount as USB disk" Click="VmMountDisk_Click" Margin="0,0,8,6" />
+                                    <Button Content="Eject" Click="VmEject_Click" Margin="0,0,8,6" />
+                                    <Button Content="Delete" Click="VmDelete_Click" Margin="0,0,8,6" />
+                                </WrapPanel>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+            <!-- ============ LICENSE ============ -->
+            <TabItem Header="License">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="4,0,8,8">
+                    <StackPanel>
+                        <TextBlock Text="LICENSE" Style="{StaticResource SectionHeader}" />
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <TextBlock x:Name="LicenseStatusText" TextWrapping="Wrap" FontWeight="SemiBold" />
+                                <TextBox x:Name="LicenseBox" Height="90" TextWrapping="Wrap" Margin="0,8,0,0" FontFamily="Consolas" FontSize="11" />
+                                <Button Content="Apply license key" Click="ApplyLicense_Click" Margin="0,8,0,0" HorizontalAlignment="Left" />
+                                <TextBlock FontSize="11" Foreground="{StaticResource HhtMuted}" TextWrapping="Wrap" Margin="0,8,0,0"
+                                           Text="Free: video, keyboard/mouse, screenshots. Pro: + reports, recording, OCR, BIOS entry, macros, playbooks, alerts, time, sign-off. Shop: + sharing, dashboards, hardware, tests, RMM, AI, cloud, beep codes." />
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+        </TabControl>
+
+        <!-- ===================== Video ===================== -->
+        <Border x:Name="VideoHost" Grid.Row="1" Grid.Column="1" Background="Black"
+                Focusable="True" ClipToBounds="True"
+                MouseDown="VideoHost_MouseDown" MouseUp="VideoHost_MouseUp"
+                MouseMove="VideoHost_MouseMove" MouseWheel="VideoHost_MouseWheel"
+                MouseLeave="VideoHost_MouseLeave">
+            <Grid>
+                <Image x:Name="VideoImage" Stretch="Uniform" RenderOptions.BitmapScalingMode="Linear" IsHitTestVisible="False" />
+                <StackPanel x:Name="NoVideoPanel" HorizontalAlignment="Center" VerticalAlignment="Center" IsHitTestVisible="False">
+                    <TextBlock Text="No video" FontSize="22" FontWeight="SemiBold" HorizontalAlignment="Center" />
+                    <TextBlock Text="Connect the target's HDMI output to the capture dongle, then press Start video."
+                               Foreground="{StaticResource HhtMuted}" Margin="0,6,0,0" HorizontalAlignment="Center" />
+                </StackPanel>
+                <StackPanel VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,10,0,0" IsHitTestVisible="False">
+                    <Border x:Name="CaptureBanner" Background="#CC2F7DF6" CornerRadius="6" Padding="12,5" Visibility="Collapsed">
+                        <TextBlock Text="Controlling target — tap Right Ctrl to release" Foreground="White" FontWeight="SemiBold" />
+                    </Border>
+                    <Border x:Name="RemoteBanner" Background="#CCE2A33A" CornerRadius="6" Padding="12,5" Margin="0,6,0,0" Visibility="Collapsed">
+                        <TextBlock x:Name="RemoteBannerText" Text="A remote technician is controlling this bench" Foreground="Black" FontWeight="SemiBold" />
+                    </Border>
+                    <Border x:Name="AlertBanner" Background="#CCE5534B" CornerRadius="6" Padding="12,5" Margin="0,6,0,0" Visibility="Collapsed">
+                        <TextBlock x:Name="AlertBannerText" Foreground="White" FontWeight="SemiBold" />
+                    </Border>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- ===================== Status bar ===================== -->
+        <Border x:Name="StatusBar" Grid.Row="2" Grid.ColumnSpan="2" Background="{StaticResource HhtPanel}"
+                BorderBrush="{StaticResource HhtPanelBorder}" BorderThickness="0,1,0,0" Padding="14,5">
+            <DockPanel>
+                <TextBlock x:Name="FpsText" DockPanel.Dock="Right" FontSize="12" Foreground="{StaticResource HhtMuted}" />
+                <TextBlock x:Name="LastLogText" FontSize="12" Foreground="{StaticResource HhtMuted}" TextTrimming="CharacterEllipsis" />
+            </DockPanel>
+        </Border>
+    </Grid>
+</Window>
